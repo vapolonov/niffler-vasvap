@@ -39,7 +39,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                             anno.username()
                     );
                     // создаем spending через API (возвращает объект - созданный spending с id)
-                    SpendJson createdSpend = spendApiClient.createSpend(spend);
+                    SpendJson createdSpend = spendApiClient.addSpend(spend);
                     // кладем созданный spending в контекст:
                     // getStore - создаем хранилище (похож на Map, данные хранятся ключ-значение), которое будет
                     // предназначено для хранения данных работы данного extension (SpendingExtension)
