@@ -18,7 +18,7 @@ buildscript {
         jakartaJaxbVersion = '4.0.2'
         springDataCommonsVersion = '3.3.3'
         wiremockVersion = '3.0.1'
-        fakerVersion = '1.0.2'
+        fakerVersion = '2.4.2'
         userdataWsdlUrl = System.getProperty("test.env") == "docker"
                 ? "http://userdata.niffler.dc:8089/ws/userdata.wsdl"
                 : "http://127.0.0.1:8089/ws/userdata.wsdl"
@@ -121,7 +121,7 @@ dependencies {
     // WEB
     testImplementation "com.codeborne:selenide:${selenideVersion}"
     // Utils
-    testImplementation("com.github.javafaker:javafaker:${fakerVersion}") {
+    testImplementation("net.datafaker:datafaker:${fakerVersion}") {
         exclude group: 'org.yaml'
     }
     testImplementation 'commons-io:commons-io:2.16.1'
