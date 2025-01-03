@@ -16,7 +16,8 @@ public class MainPage {
 
     private final SelenideElement
             menuButton = $("[aria-label='Menu']"),
-            profileButton = $$(".nav-link").findBy(text("Profile"));
+            profileButton = $$(".nav-link").findBy(text("Profile")),
+            friendsButton = $$(".nav-link").findBy(text("Friends"));
 
     public EditSpendingPage editSpending(String spendingDescription) {
         tableRows.find(textCaseSensitive(spendingDescription)).$("td", 5).click();
@@ -48,5 +49,9 @@ public class MainPage {
         return new ProfilePage();
     }
 
-
+    public FriendsPage selectUserFriends() {
+        menuButton.click();
+        friendsButton.click();
+        return new FriendsPage();
+    }
 }
