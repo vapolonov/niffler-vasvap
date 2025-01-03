@@ -14,7 +14,7 @@ enum LocalConfig implements Config {
     }
 
     @Override
-    public String categoryUrl() {
-        return "http://127.0.0.1:8090/";
+    public String ghUrl() {
+        return "https://api.github.com/";
     }
 }

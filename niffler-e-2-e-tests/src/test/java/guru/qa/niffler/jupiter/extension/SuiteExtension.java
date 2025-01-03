@@ -3,7 +3,7 @@
  * BeforeAllCallback и AfterAllCallBack, чтобы реализовать свой extension, который будет вести себя как BeforeSuiteCallback и AfterSuiteCallback
  */
 
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

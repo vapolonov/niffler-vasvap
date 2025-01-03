@@ -1,8 +1,9 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.jupiter.BrowserExtension;
-import guru.qa.niffler.jupiter.Spending;
+import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
+import guru.qa.niffler.jupiter.extension.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ public class SpendingWebTest {
             description = "java advanced",
             amount = 50000
     )
+    @DisabledByIssue("4")
     @Test
     public void categoryDescriptionShouldBeChangedFromTable(SpendJson spend) {
         final String newDescription = "Java Advanced 2.0";
