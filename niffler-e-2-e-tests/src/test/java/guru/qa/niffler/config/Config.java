@@ -10,5 +10,5 @@ public interface Config {
 
     String spendUrl();
 
-    String categoryUrl();
+    String ghUrl();
 }

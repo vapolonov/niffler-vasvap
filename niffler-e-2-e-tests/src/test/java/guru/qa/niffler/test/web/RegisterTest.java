@@ -2,7 +2,7 @@ package guru.qa.niffler.test.web;
 
 
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.jupiter.BrowserExtension;
+import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
