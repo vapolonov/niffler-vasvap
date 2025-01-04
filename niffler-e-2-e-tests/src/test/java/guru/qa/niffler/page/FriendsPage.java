@@ -3,8 +3,10 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.SelenideElement;
 import org.checkerframework.checker.units.qual.N;
 
+import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.CollectionCondition.textsInAnyOrder;
 import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -16,7 +18,6 @@ public class FriendsPage {
 
     private final SelenideElement
             tableFriendsBody = $("#friends"),
-            tableAllBody = $("#all"),
             tableRequestsBody = $("#requests"),
             friendsTab = $$("[role='tablist'] h2").first(),
             allPeopleTab = $$("[role='tablist'] h2").get(1),
@@ -28,30 +29,38 @@ public class FriendsPage {
     }
 
     public void checkFriendName(String name) {
-        tableFriendsBody.$("tr").shouldHave(text(name));
+//        tableFriendsBody.$("tr").shouldHave(text(name));
+        tableFriendsBody.$$("tr").findBy(text(name)).shouldBe(visible);
+
     }
 
-//    public FriendsPage checkExistingFriends(String... expectedUsernames) {
-//        tableFriendsBody.$$("tr").shouldHave(textsInAnyOrder(expectedUsernames));
-//        return this;
-//    }
+    public FriendsPage checkExistingFriends(String... expectedUsernames) {
+        tableFriendsBody.$$("tr").shouldHave(textsInAnyOrder(expectedUsernames));
+        return this;
+    }
 
     public void checkNoFriends() {
         noUsersText.shouldHave(text(NO_USERS_FOUND));
     }
 
-    public void checkIncomeRequests(String name) {
-        tableRequestsBody.$$("tr").first().shouldHave(text(name));
-    }
-
-    public FriendsPage selectAllPeopleTab() {
-        allPeopleTab.click();
+    public FriendsPage checkNoExistingFriends() {
+        tableFriendsBody.$$("tr").shouldHave(size(0));
         return this;
     }
 
-    public void checkOutputRequests(String name, String status) {
-        tableAllBody.$$("tr").first().$$("td").first().shouldHave(text(name));
-        tableAllBody.$$("tr").first().$$("td").get(1).shouldHave(text(status));
-
+    public void checkIncomeRequests(String name) {
+//        tableRequestsBody.$$("tr").first().shouldHave(text(name));
+        tableRequestsBody.$$("tr").find(text(name)).shouldBe(visible);
     }
+
+    public FriendsPage checkExistingInvitations(String... expectedUsernames) {
+        tableRequestsBody.$$("tr").shouldHave(textsInAnyOrder(expectedUsernames));
+        return this;
+    }
+
+    public AllPeoplePage selectAllPeopleTab() {
+        allPeopleTab.click();
+        return new AllPeoplePage();
+    }
+
 }
