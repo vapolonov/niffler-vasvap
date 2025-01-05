@@ -19,5 +19,4 @@ public record SpendJson(
     @JsonProperty("description")
     String description,
     @JsonProperty("username")
-    String username) {
-}
+    String username){}

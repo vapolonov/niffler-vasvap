@@ -2,18 +2,16 @@ package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static com.codeborne.selenide.Selenide.open;
+import static guru.qa.niffler.test.web.utils.RandomDataUtils.randomPassword;
+import static guru.qa.niffler.test.web.utils.RandomDataUtils.randomUsername;
 
 @WebTest
 public class LoginTest {
     private static final Config CFG = Config.getInstance();
-    Faker faker = new Faker();
 
     @Test
     public void mainPageShouldBeDisplayedAfterSuccessfulLogin() {
@@ -27,7 +25,7 @@ public class LoginTest {
     @Test
     public void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
         open(CFG.frontUrl(), LoginPage.class)
-                .doLoginWithBadCredentials(faker.internet().username(), faker.internet().password(3, 12))
+                .doLoginWithBadCredentials(randomUsername(), randomPassword())
                 .checkBadCredentialsErrorMsg()
                 .checkLoginPageTitle();
     }

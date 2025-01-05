@@ -11,4 +11,9 @@ public interface Config {
     String spendUrl();
 
     String ghUrl();
+
+    String gatewayUrl();
+
+    String userdataUrl();
+
 }
