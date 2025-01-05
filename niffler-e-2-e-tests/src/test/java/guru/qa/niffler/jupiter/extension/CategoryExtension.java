@@ -20,14 +20,12 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
                 .ifPresent(anno -> {
                     CategoryJson categoryJson;
-                    String user;
                     if (anno.categories().length > 0) {
-                        user = anno.username();
                         Category category = anno.categories()[0];
                         categoryJson = new CategoryJson(
                                 null,
                                 randomUsername(),
-                                user,
+                                anno.username(),
                                 category.archived()
                         );
 
@@ -38,7 +36,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                             CategoryJson archivedCategory = new CategoryJson(
                                     created.id(),
                                     created.name(),
-                                    user,
+                                    created.username(),
                                     true
                             );
                             created = categoriesApiClient.updateCategory(archivedCategory);
