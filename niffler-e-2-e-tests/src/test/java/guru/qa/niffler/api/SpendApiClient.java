@@ -1,11 +1,9 @@
 package guru.qa.niffler.api;
 
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.DataFilterValues;
 import guru.qa.niffler.model.SpendJson;
-import lombok.SneakyThrows;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -30,7 +28,7 @@ public class SpendApiClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code());
+        assertEquals(201, response.code());
         return response.body();
     }
 

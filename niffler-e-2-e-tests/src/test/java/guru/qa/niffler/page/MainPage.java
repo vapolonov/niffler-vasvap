@@ -54,4 +54,8 @@ public class MainPage {
         friendsButton.click();
         return new FriendsPage();
     }
+
+    public void checkMainPageTitle() {
+        $$("h2").find(text("History of Spendings")).shouldBe(visible);
+    }
 }

@@ -2,43 +2,50 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.CategoriesApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
+
+import static guru.qa.niffler.test.web.utils.RandomDataUtils.randomUsername;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver, AfterTestExecutionCallback {
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
     private final CategoriesApiClient categoriesApiClient = new CategoriesApiClient();
-    private final Faker fakeData = new Faker();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), Category.class)
+        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
                 .ifPresent(anno -> {
-                    CategoryJson category = new CategoryJson(
-                            null,
-                            fakeData.internet().username(),
-                            anno.username(),
-                            anno.archived()
-                    );
-
-                    CategoryJson created = categoriesApiClient.addCategories(category);
-                    if (anno.archived()) {
-                        CategoryJson archivedCategory = new CategoryJson(
-                                created.id(),
-                                created.name(),
-                                created.username(),
-                                true
+                    CategoryJson categoryJson;
+                    if (anno.categories().length > 0) {
+                        Category category = anno.categories()[0];
+                        categoryJson = new CategoryJson(
+                                null,
+                                randomUsername(),
+                                anno.username(),
+                                category.archived()
                         );
-                        created = categoriesApiClient.updateCategory(archivedCategory);
-                    }
-                    context.getStore(NAMESPACE).put(
+
+
+                        CategoryJson created = categoriesApiClient.addCategories(categoryJson);
+
+                        if (anno.categories()[0].archived()) {
+                            CategoryJson archivedCategory = new CategoryJson(
+                                    created.id(),
+                                    created.name(),
+                                    created.username(),
+                                    true
+                            );
+                            created = categoriesApiClient.updateCategory(archivedCategory);
+                        }
+                        context.getStore(NAMESPACE).put(
                                 context.getUniqueId(),
                                 created
                         );
+                    }
                 });
     }
 
@@ -55,14 +62,16 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
         CategoryJson category = context.getStore(CategoryExtension.NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
-        if (!category.archived()) {
-            category = new CategoryJson(
-                    category.id(),
-                    category.name(),
-                    category.username(),
-                    true
-            );
-            categoriesApiClient.updateCategory(category);
+        if (category != null) {
+            if (!category.archived()) {
+                category = new CategoryJson(
+                        category.id(),
+                        category.name(),
+                        category.username(),
+                        true
+                );
+                categoriesApiClient.updateCategory(category);
+            }
         }
     }
 }

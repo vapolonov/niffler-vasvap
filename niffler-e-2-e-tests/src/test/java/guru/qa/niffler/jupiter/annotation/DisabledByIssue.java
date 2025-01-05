@@ -8,8 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)  // означает, что мы сможем прочитать аннотацию через Java Reflection API
-@Target({ElementType.METHOD, ElementType.TYPE})  // где мы будем ставить данную аннотацию METHOD - метод (над тестом), TYPE - класс (над тестовым классом)
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @ExtendWith(IssueExtension.class)
 public @interface DisabledByIssue {
     String value();
