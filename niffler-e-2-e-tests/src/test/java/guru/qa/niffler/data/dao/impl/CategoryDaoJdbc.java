@@ -6,6 +6,7 @@ import guru.qa.niffler.data.dao.CategoryDao;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class CategoryDaoJdbc implements CategoryDao {
     }
 
     @Override
-    public void update(CategoryEntity category) {
+    public void updateCategoryStatus(CategoryEntity category) {
         try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
             try (PreparedStatement ps = connection.prepareStatement(
                     "UPDATE category SET archived = ? WHERE id = ?"
@@ -123,16 +124,16 @@ public class CategoryDaoJdbc implements CategoryDao {
                 ps.execute();
 
                 try (ResultSet rs = ps.getResultSet()) {
-                    if (rs.next()) {
+                    ArrayList<CategoryEntity> categoriesList = new ArrayList<>();
+                    while (rs.next()) {
                         CategoryEntity ce = new CategoryEntity();
                         ce.setId(rs.getObject("id", UUID.class));
                         ce.setUsername(rs.getString("username"));
                         ce.setName(rs.getString("name"));
                         ce.setArchived(rs.getBoolean("archived"));
-                        return List.of(ce);
-                    } else {
-                        return List.of();
+                        categoriesList.add(ce);
                     }
+                    return categoriesList;
                 }
             }
         } catch (SQLException e) {

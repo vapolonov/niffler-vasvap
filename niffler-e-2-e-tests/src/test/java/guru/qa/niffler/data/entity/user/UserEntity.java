@@ -1,10 +1,12 @@
 package guru.qa.niffler.data.entity.user;
 import guru.qa.niffler.model.CurrencyValues;
 
+import guru.qa.niffler.model.UserJson;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Getter
@@ -19,16 +21,16 @@ public class UserEntity implements Serializable {
     private byte[] photoSmall;
     private String fullname;
 
-    public static UserEntity fromJson(UserEntity json) {
+    public static UserEntity fromJson(UserJson json) {
         UserEntity ue = new UserEntity();
-        ue.setId(json.id);
-        ue.setUsername(json.getUsername());
-        ue.setCurrency(json.getCurrency());
-        ue.setFirstname(json.getFirstname());
-        ue.setSurname(json.getSurname());
-        ue.setPhoto(json.getPhoto());
-        ue.setPhotoSmall(json.getPhotoSmall());
-        ue.setFullname(json.getFullname());
+        ue.setId(json.id());
+        ue.setUsername(json.username());
+        ue.setCurrency(json.currency());
+        ue.setFirstname(json.firstname());
+        ue.setSurname(json.surname());
+        ue.setPhoto(json.photo()!= null ? json.photo().getBytes(StandardCharsets.UTF_8) : null);
+        ue.setPhotoSmall(json.photoSmall() != null ? json.photoSmall().getBytes(StandardCharsets.UTF_8) : null);
+        ue.setFullname(json.fullname());
         return ue;
     }
 }

@@ -8,6 +8,7 @@ import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,14 +60,15 @@ public class SpendDaoJdbc implements SpendDao {
 
                 try (ResultSet rs = ps.getResultSet()) {
                     if (rs.next()) {
+                        CategoryEntity ce = new CategoryEntity();
                         SpendEntity se = new SpendEntity();
                         se.setId(id);
                         se.setUsername(rs.getString("username"));
                         se.setSpendDate(rs.getDate("spend_date"));
-                        se.setCurrency(CurrencyValues.RUB);
+                        se.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
                         se.setAmount(rs.getDouble("amount"));
                         se.setDescription(rs.getString("description"));
-                        se.setCategory(rs.getObject("category_id", CategoryEntity.class));
+                        se.setCategory(ce);
                         return Optional.of(se);
                     } else {
                         return Optional.empty();
@@ -88,19 +90,20 @@ public class SpendDaoJdbc implements SpendDao {
                 ps.execute();
 
                 try (ResultSet rs = ps.getResultSet()) {
-                    if (rs.next()) {
+                    List<SpendEntity> spendsList = new ArrayList<>();
+                    while (rs.next()) {
                         SpendEntity se = new SpendEntity();
+                        CategoryEntity ce = new CategoryEntity();
                         se.setId(rs.getObject("id", UUID.class));
                         se.setUsername(rs.getString("username"));
                         se.setSpendDate(rs.getDate("spend_date"));
-                        se.setCurrency(CurrencyValues.RUB);
+                        se.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
                         se.setAmount(rs.getDouble("amount"));
                         se.setDescription(rs.getString("description"));
-                        se.setCategory(rs.getObject("category_id", CategoryEntity.class));
-                        return List.of(se);
-                    } else {
-                        return List.of();
+                        se.setCategory(ce);
+                        spendsList.add(se);
                     }
+                    return spendsList;
                 }
             }
         } catch (SQLException e) {
