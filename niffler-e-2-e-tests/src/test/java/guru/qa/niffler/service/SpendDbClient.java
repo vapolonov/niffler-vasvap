@@ -11,6 +11,7 @@ import guru.qa.niffler.model.SpendJson;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SpendDbClient {
 
@@ -48,11 +49,19 @@ public class SpendDbClient {
         return categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName).map(CategoryJson::fromEntity);
     }
 
-    public List<CategoryEntity> findAllCategoriesByUsername(String username) {
-        return categoryDao.findAllCategoriesByUsername(username);
+    public List<CategoryJson> findAllCategoriesByUsername1(String username) {
+        return categoryDao
+                .findAllCategoriesByUsername(username)
+                .stream()
+                .map(CategoryJson::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public List<SpendEntity> findAllSpendsByUsername(String username) {
-        return spendDao.findAllSpendsByUsername(username);
+    public List<SpendJson> findAllSpendsByUsername(String username) {
+        return spendDao
+                .findAllSpendsByUsername(username)
+                .stream()
+                .map(SpendJson::fromEntity)
+                .collect(Collectors.toList());
     }
 }
