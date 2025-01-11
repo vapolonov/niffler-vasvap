@@ -1,11 +1,10 @@
 package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.api.SpendApiClient;
-import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -15,39 +14,34 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
 
-    private final SpendApiClient spendApiClient = new SpendApiClient();
+    private final SpendDbClient spendDbClient = new SpendDbClient();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-                .ifPresent(anno -> {
-                    if (anno.spendings().length > 0) {
-                        Spending spending = anno.spendings()[0];
-                        String user = anno.username();
-                        SpendJson spendJson = new SpendJson(
+        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class).ifPresent(anno -> {
+            if (anno.spendings().length > 0) {
+                SpendJson spend = new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
                                 null,
-                                new Date(),
-                                new CategoryJson(
-                                        null,
-                                        spending.category(),
-                                        user,
-                                        false
-                                ),
-                                CurrencyValues.RUB,
-                                spending.amount(),
-                                spending.description(),
-                                user
-                        );
+                                anno.spendings()[0].category(),
+                                anno.username(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        anno.spendings()[0].amount(),
+                        anno.spendings()[0].description(),
+                        anno.username());
 
-                        SpendJson createdSpend = spendApiClient.addSpend(spendJson);
-
-                        context.getStore(NAMESPACE).put(
-                                context.getUniqueId(),
-                                createdSpend
-                        );
-                    }
-                });
+                context.getStore(NAMESPACE).put(
+                        context.getUniqueId(),
+                        spendDbClient.createSpend(spend)
+                );
+            }
+        });
     }
+
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
