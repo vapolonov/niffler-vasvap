@@ -20,13 +20,13 @@ public class JdbsTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "test-cat-name-1",
+                                "test-cat-tx",
                                 "vasvap",
                                 false
                         ),
                         CurrencyValues.RUB,
-                        100.0,
-                        "test description",
+                        3400.0,
+                        "test tx",
                         "vasvap"
                 )
         );
