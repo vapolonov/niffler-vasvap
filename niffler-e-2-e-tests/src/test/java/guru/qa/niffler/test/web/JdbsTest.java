@@ -3,7 +3,9 @@ package guru.qa.niffler.test.web;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
+import guru.qa.niffler.service.UserDbClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -20,7 +22,7 @@ public class JdbsTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "test-cat-tx",
+                                "test-cat-tx-1",
                                 "vasvap",
                                 false
                         ),
@@ -32,4 +34,23 @@ public class JdbsTest {
         );
         System.out.println(spend);
     }
+
+    @Test
+    void xaTxTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUser((
+                new UserJson(
+                        null,
+                        "vasvap",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null
+                )
+        ));
+        System.out.println(user);
+    }
 }
+
