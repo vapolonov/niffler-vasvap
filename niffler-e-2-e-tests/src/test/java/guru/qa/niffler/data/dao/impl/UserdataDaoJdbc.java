@@ -22,17 +22,11 @@ public class UserdataDaoJdbc implements UserdataDao {
     @Override
     public UserEntity createUser(UserEntity user) {
         try (PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO \"user\" (username, currency, firstname, surname, photo, photo_small, full_name) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO \"user\" (username, currency) VALUES (?, ?)",
                 Statement.RETURN_GENERATED_KEYS
         )) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getCurrency().name());
-            ps.setString(3, user.getFirstname());
-            ps.setString(4, user.getSurname());
-            ps.setBytes(5, user.getPhoto());
-            ps.setBytes(6, user.getPhotoSmall());
-            ps.setString(7, user.getFullname());
 
             ps.executeUpdate();
 
