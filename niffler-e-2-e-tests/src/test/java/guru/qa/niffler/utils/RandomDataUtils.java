@@ -1,6 +1,6 @@
 package guru.qa.niffler.utils;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 public class RandomDataUtils {
 
