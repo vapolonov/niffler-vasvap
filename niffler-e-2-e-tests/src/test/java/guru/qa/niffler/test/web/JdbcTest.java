@@ -24,14 +24,14 @@ public class JdbcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "cat-name-tx-2",
-                                "duck",
+                                "cat-name-tx-3",
+                                "vasvap",
                                 false
                         ),
                         CurrencyValues.RUB,
                         1000.0,
                         "spend-name-tx",
-                        null
+                        "vasvap"
                 )
         );
 
@@ -44,7 +44,7 @@ public class JdbcTest {
         UserJson user = usersDbClient.createUser(
                 new UserJson(
                         null,
-                        "valentin-4",
+                        "valentin-40",
                         null,
                         null,
                         null,
@@ -63,7 +63,7 @@ public class JdbcTest {
         UserJson user = usersDbClient.createUserSpringJdbc(
                 new UserJson(
                         null,
-                        "valentin-5",
+                        "valentin-16",
                         null,
                         null,
                         null,
