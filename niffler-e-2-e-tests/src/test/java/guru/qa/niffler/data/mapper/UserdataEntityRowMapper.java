@@ -8,11 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class UdUserEntityRowMapper implements RowMapper<UserEntity> {
+public class UserdataEntityRowMapper implements RowMapper<UserEntity> {
 
-    public static final UdUserEntityRowMapper instance = new UdUserEntityRowMapper();
+    public static final UserdataEntityRowMapper instance = new UserdataEntityRowMapper();
 
-    private UdUserEntityRowMapper() {
+    private UserdataEntityRowMapper() {
     }
 
     @Override
