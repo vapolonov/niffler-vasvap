@@ -22,7 +22,7 @@ public class Databases {
     private Databases() {
     }
 
-    private static final Map<String, DataSource> dataSources = new ConcurrentHashMap<>();
+    public static final Map<String, DataSource> dataSources = new ConcurrentHashMap<>();
     // Каждый поток выполнения тестов может оперировать одним или несколькими connection, т.к. тест может ходить в одну или несколько БД.
     // Соответственно ключом в Map является ID потока (Long), т.е. привязываем к потоку ту Map коннектов, которой оперирует данный поток.
     // Map коннектов это те коннекты для конкретного JDBC URL (JDBC URL выступает ключом (String), а коннект значение (Connection).
@@ -124,7 +124,7 @@ public class Databases {
                     dsBean.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
                     Properties props = new Properties();
                     props.put("URL", jdbcUrl);
-                    props.put("user", "posgres");
+                    props.put("user", "postgres");
                     props.put("password", "secret");
                     dsBean.setXaProperties(props);
                     dsBean.setMaxPoolSize(10);
