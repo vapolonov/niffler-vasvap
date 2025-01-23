@@ -2,18 +2,14 @@ package guru.qa.niffler.service;
 
 import com.atomikos.icatch.jta.template.TransactionTemplate;
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.Databases.XaFunction;
 import guru.qa.niffler.data.dao.*;
 import guru.qa.niffler.data.dao.impl.*;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.user.UserEntity;
-import guru.qa.niffler.data.tpl.DataSources;
-import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.UserJson;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,10 +22,9 @@ public class UsersDbClient {
 
     private final AuthUserDao authUserDao = new AuthUserDaoJdbc();
     private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoJdbc();
-    private final UserdataDao userDataDao = new UserdataDaoSpringJdbc();
+    private final UserdataDao userdataDao = new UserdataDaoSpringJdbc();
 
     private final TransactionTemplate txTemplate = new TransactionTemplate();
-
 
     private final XaTransactionTemplate xaTxTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
@@ -59,14 +54,12 @@ public class UsersDbClient {
 
                     authAuthorityDao.create(authorityEntities);
                     return UserJson.fromEntity(
-                            userDataDao.createUser(UserEntity.fromJson(user)),
+                            userdataDao.createUser(UserEntity.fromJson(user)),
                             null
                     );
                 }
         );
-
     }
-
 
     public UserJson createUser(UserJson user) {
         return UserJson.fromEntity(
@@ -93,7 +86,7 @@ public class UsersDbClient {
                             ue.setUsername(user.username());
                             ue.setFullname(user.fullname());
                             ue.setCurrency(user.currency());
-                            userDataDao.createUser(ue);
+                            userdataDao.createUser(ue);
                             return ue;
                         }
                 ),null);

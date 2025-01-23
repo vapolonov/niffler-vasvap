@@ -23,7 +23,6 @@ public class XaTransactionTemplate {
     }
 
     public <T> T execute(Supplier<T>... actions) {
-        // это и есть распределенная транзакция
         UserTransaction ut = new UserTransactionImp() {};
         try {
             ut.begin();
