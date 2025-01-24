@@ -151,7 +151,7 @@
                 </xs:restriction>
             </xs:simpleType>
 
-            <xs:simpleType name="friendState">
+            <xs:simpleType name="friendshipStatus">
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="INVITE_SENT"/>
                     <xs:enumeration value="INVITE_RECEIVED"/>
