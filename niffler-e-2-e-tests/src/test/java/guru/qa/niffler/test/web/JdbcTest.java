@@ -8,6 +8,8 @@ import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
 
@@ -17,7 +19,6 @@ public class JdbcTest {
     @Test
     void txTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
-
         SpendJson spend = spendDbClient.createSpend(
                 new SpendJson(
                         null,
@@ -38,60 +39,30 @@ public class JdbcTest {
         System.out.println(spend);
     }
 
-    @Test
-    void xaTxTest() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "valentin-7"
+    })
+    void addFriendshipRequestTest(String username) {
         UsersDbClient usersDbClient = new UsersDbClient();
         UserJson user = usersDbClient.createUser(
-                new UserJson(
-                        null,
-                        "valentin-43",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
+                username,
+                "12345"
         );
+
+        usersDbClient.addFriendshipRequest(user, 1);
         System.out.println(user);
     }
 
     @Test
-    void springJdbcTest() {
+    void addFriendTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
-                new UserJson(
-                        null,
-                        "valentin-19",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
+        UserJson user = usersDbClient.createUser(
+                "valera-1",
+                "12345"
         );
-        System.out.println(user);
-    }
 
-    @Test
-    void chainedTxTest() {
-        UsersDbClient usersDbClient = new UsersDbClient();
-        UserJson user = usersDbClient.createUserTxTemplate(
-                new UserJson(
-                        null,
-                        "valentin-62",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
+        usersDbClient.addFriend(user, 1);
         System.out.println(user);
     }
 }
