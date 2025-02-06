@@ -58,11 +58,23 @@ public class UserdataDaoSpringJdbc implements UserdataDao {
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        return Optional.empty();
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+        return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                        "SELECT * FROM \"user\" WHERE username = ?",
+                        UserdataEntityRowMapper.instance,
+                        username
+                )
+        );
     }
 
     @Override
     public void delete(UserEntity user) {
-
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+        jdbcTemplate.update(
+                "DELETE FROM \"user\" WHERE id = ?",
+                UserdataEntityRowMapper.instance,
+                user.getId()
+        );
     }
 }

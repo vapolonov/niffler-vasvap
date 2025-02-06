@@ -2,8 +2,11 @@ package guru.qa.niffler.data.tpl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
 public class JdbcTransactionTemplate {
 
@@ -19,10 +22,11 @@ public class JdbcTransactionTemplate {
         return this;
     }
 
-    public <T> T execute(Supplier<T> action) {
+    public <T> T execute(Supplier<T> action, int isolationLvl) {
         Connection connection = null;
         try {
             connection = holder.connection();
+            connection.setTransactionIsolation(isolationLvl);
             connection.setAutoCommit(false);
             T result = action.get();
             connection.commit();
@@ -43,5 +47,9 @@ public class JdbcTransactionTemplate {
                 holder.close();
             }
         }
+    }
+
+    public <T> T execute(Supplier<T> action) {
+        return execute(action, TRANSACTION_READ_COMMITTED);
     }
 }
