@@ -104,7 +104,21 @@ public class UsersDbClient implements UsersClient {
                 );
             }
         }
+    }
 
+    public void deleteUser(UserJson user) {
+        xaTxTemplate.execute( () -> {
+            UserEntity ueToDelete = userdataRepository.findById(
+                    user.id()
+            ).orElseThrow();
+            AuthUserEntity aueToDelete = authUserRepository.findByUsername(
+                    user.username()
+            ).orElseThrow();
+
+            authUserRepository.remove(aueToDelete);
+            userdataRepository.delete(ueToDelete);
+            return null;
+        });
     }
 
     private AuthUserEntity authUserEntity(String username, String password) {

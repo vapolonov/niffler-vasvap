@@ -6,7 +6,6 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -50,7 +49,7 @@ public class JdbcTest {
                 "12345"
         );
 
-        usersDbClient.addFriendshipRequest(user, 1);
+        usersDbClient.createIncomeInvitations(user, 1);
         System.out.println(user);
     }
 
@@ -58,11 +57,11 @@ public class JdbcTest {
     void addFriendTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
         UserJson user = usersDbClient.createUser(
-                "valera-1",
+                "valera-2",
                 "12345"
         );
 
-        usersDbClient.addFriend(user, 1);
+        usersDbClient.createFriends(user, 1);
         System.out.println(user);
     }
 }
