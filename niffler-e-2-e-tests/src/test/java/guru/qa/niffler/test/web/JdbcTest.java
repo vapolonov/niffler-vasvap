@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
+import java.util.UUID;
 
 
 public class JdbcTest {
@@ -36,6 +37,33 @@ public class JdbcTest {
         );
 
         System.out.println(spend);
+    }
+
+    @Test
+    void createCategoryTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        CategoryJson category = spendDbClient.createCategory(
+                new CategoryJson(
+                        null,
+                        "test-category-123",
+                        "oliver.leffler",
+                        true
+                )
+        );
+        System.out.println(category);
+    }
+
+    @Test
+    void deleteCategoryTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        spendDbClient.removeCategory(
+                new CategoryJson(
+                        UUID.fromString("d996d488-e64b-11ef-ba8a-0242ac110004"),
+                        "test-category-999",
+                        "jim.zieme",
+                        false
+                )
+        );
     }
 
     @ParameterizedTest

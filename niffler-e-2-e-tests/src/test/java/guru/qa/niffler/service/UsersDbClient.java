@@ -7,11 +7,11 @@ import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.user.UserEntity;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.repository.UserdataRepository;
-import guru.qa.niffler.data.repository.impl.AuthUserRepositoryHibernate;
-import guru.qa.niffler.data.repository.impl.UserdataRepositoryHibernate;
+import guru.qa.niffler.data.repository.impl.*;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.UserJson;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,14 +24,19 @@ public class UsersDbClient implements UsersClient {
     private static final Config CFG = Config.getInstance();
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
-    private final UserdataRepository userdataRepository = new UserdataRepositoryHibernate();
+//    private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
+//    private final UserdataRepository userdataRepository = new UserdataRepositoryHibernate();
+    private final AuthUserRepository authUserRepository = new AuthUserRepositorySpringJdbc();
+    private final UserdataRepository userdataRepository = new UserdataRepositorySpringJdbc();
+//    private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
+//    private final UserdataRepository userdataRepository = new UserdataRepositoryJdbc();
 
     private final XaTransactionTemplate xaTxTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
             CFG.userdataJdbcUrl()
     );
 
+    @NotNull
     @Override
     public UserJson createUser(String username, String password) {
         return xaTxTemplate.execute(() -> {
@@ -56,7 +61,7 @@ public class UsersDbClient implements UsersClient {
                 xaTxTemplate.execute(() -> {
                     final String username = randomUsername();
                     UserEntity addressee = createNewUser(username);
-                    userdataRepository.sendInvitation(targetEntity, addressee);
+                    userdataRepository.sendInvitation(addressee, targetEntity);
                     return null;
                 });
             }
@@ -76,7 +81,7 @@ public class UsersDbClient implements UsersClient {
                     final String username = randomUsername();
                     UserEntity addressee = createNewUser(username);
 
-                    userdataRepository.sendInvitation(addressee, targetEntity);
+                    userdataRepository.sendInvitation(targetEntity, addressee);
                     return null;
                 });
             }
