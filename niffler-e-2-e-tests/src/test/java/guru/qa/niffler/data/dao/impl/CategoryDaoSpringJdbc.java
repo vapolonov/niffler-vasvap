@@ -5,6 +5,7 @@ import guru.qa.niffler.data.dao.CategoryDao;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.mapper.CategoryEntityRowMapper;
 import guru.qa.niffler.data.tpl.DataSources;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -39,7 +40,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public void updateCategoryStatus(CategoryEntity category) {
+    public void updateCategory(CategoryEntity category) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         jdbcTemplate.update(
                 "UPDATE category SET archived=? WHERE name=?",
@@ -49,15 +50,20 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryByID(UUID id) {
+    public Optional<CategoryEntity> findCategoryById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        return Optional.ofNullable(
-                jdbcTemplate.queryForObject(
-                        "SELECT * FROM category WHERE id = ?",
-                        CategoryEntityRowMapper.instance,
-                        id
-                )
-        );
+        try {
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject(
+                            "SELECT * FROM category WHERE id = ?",
+                            CategoryEntityRowMapper.instance,
+                            id
+                    )
+            );
+
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

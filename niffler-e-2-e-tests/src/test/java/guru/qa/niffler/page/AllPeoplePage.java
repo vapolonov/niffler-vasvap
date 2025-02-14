@@ -11,9 +11,7 @@ public class AllPeoplePage {
     private final SelenideElement tableAllBody = $("#all");
 
     public void checkOutputRequests(String name, String status) {
-//        tableAllBody.$$("tr").first().$$("td").first().shouldHave(text(name));
         tableAllBody.$$("tr").find(text(name)).shouldBe(visible);
-//        tableAllBody.$$("tr").first().$$("td").get(1).shouldHave(text(status));
         tableAllBody.$$("tr").find(text(status)).shouldBe(visible);
     }
 }

@@ -21,12 +21,12 @@ public class ProfileTest {
             categories = {@Category(archived = true)}
     )
     @Test
-    void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) {
+    void archivedCategoryShouldPresentInCategoriesList(CategoryJson[] category) {
         open(CFG.frontUrl(), LoginPage.class)
                 .doLogin("vasvap", "12345")
                 .selectUserProfile()
                 .selectCheckbox()
-                .checkCategoryInList(category.name());
+                .checkCategoryInList(category[0].name());
     }
 
     @User(

@@ -1,8 +1,13 @@
 package guru.qa.niffler.test.web;
 
+import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.page.FriendsPage;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Selenide.open;
@@ -14,40 +19,48 @@ public class FriendsWebTest {
 
     private static final Config CFG = Config.getInstance();
 
+    @User(friends = 1)
     @Test
-    void friendShouldBePresentInFriendsTable(@UserType(WITH_FRIEND) StaticUser user) {
+    void friendShouldBePresentInFriendsTable(UserJson user) {
+        final String friendUsername = user.testData().friendsUsernames()[0];
+
         open(CFG.frontUrl(), LoginPage.class)
-                .doLogin(user.username(), user.password())
+                .doLogin(user.username(), user.testData().password())
                 .selectUserFriends()
                 .checkPageOpen()
-                .checkFriendName(user.friend());
+                .checkFriendName(friendUsername);
     }
 
+    @User
     @Test
-    void friendsTableShouldBeEmptyForNewUser(@UserType(EMPTY) StaticUser user) {
+    void friendsTableShouldBeEmptyForNewUser(UserJson user) {
         open(CFG.frontUrl(), LoginPage.class)
-                .doLogin(user.username(), user.password())
+                .doLogin(user.username(), user.testData().password())
                 .selectUserFriends()
                 .checkPageOpen()
                 .checkNoFriends();
     }
 
+    @User(incomeInvitations = 1)
     @Test
-    void incomeInvitationBePresentInFriendsTable(@UserType(WITH_INCOME_REQUEST) StaticUser user) {
+    void incomeInvitationBePresentInFriendsTable(UserJson user) {
+        final String friendUsername = user.testData().incomeInvitationsUsernames()[0];
         open(CFG.frontUrl(), LoginPage.class)
-                .doLogin(user.username(), user.password())
+                .doLogin(user.username(), user.testData().password())
                 .selectUserFriends()
                 .checkPageOpen()
-                .checkIncomeRequests(user.income());
+                .checkIncomeRequests(friendUsername);
     }
 
+    @User(outcomeInvitations = 1)
     @Test
-    void outcomeInvitationBePresentInAllPeoplesTable(@UserType(WITH_OUTCOME_REQUEST) StaticUser user) {
+    void outcomeInvitationBePresentInAllPeoplesTableStaticUser(UserJson user) {
+        final String friendUsername = user.testData().outcomeInvitationsUsernames()[0];
         open(CFG.frontUrl(), LoginPage.class)
-                .doLogin(user.username(), user.password())
+                .doLogin(user.username(), user.testData().password())
                 .selectUserFriends()
                 .checkPageOpen()
                 .selectAllPeopleTab()
-                .checkOutputRequests(user.outcome(), "Waiting...");
+                .checkOutputRequests(friendUsername, "Waiting...");
     }
 }

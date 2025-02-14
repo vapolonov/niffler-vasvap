@@ -33,7 +33,7 @@ public class CategoryEntity implements Serializable {
     CategoryEntity ce = new CategoryEntity();
     ce.setId(json.id());
     ce.setName(json.name());
-    ce.setUsername(json.name());
+    ce.setUsername(json.username());
     ce.setArchived(json.archived());
     return ce;
   }

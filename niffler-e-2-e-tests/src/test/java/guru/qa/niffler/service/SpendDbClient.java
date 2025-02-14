@@ -6,89 +6,79 @@ import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 
 import guru.qa.niffler.data.repository.SpendRepository;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryHibernate;
 import guru.qa.niffler.data.repository.impl.SpendRepositoryJdbc;
-import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
+import guru.qa.niffler.data.repository.impl.SpendRepositorySpringJdbc;
+import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
-public class SpendDbClient {
+public class SpendDbClient implements SpendClient {
 
     private static final Config CFG = Config.getInstance();
 
-    private final SpendRepository spendRepository = new SpendRepositoryJdbc();
+    private final SpendRepository spendRepository = new SpendRepositorySpringJdbc();
+//    private final SpendRepository spendRepository = new SpendRepositoryJdbc();
+//    private final SpendRepository spendRepository = new SpendRepositoryHibernate();
 
-    private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(
+    private final XaTransactionTemplate xaTxTemplate = new XaTransactionTemplate(
             CFG.spendJdbcUrl()
     );
 
     public SpendJson createSpend(SpendJson spend) {
-        return jdbcTxTemplate.execute(() -> {
-                    SpendEntity spendEntity = SpendEntity.fromJson(spend);
-                    if (spendEntity.getCategory().getId() == null) {
-                        CategoryEntity categoryEntity = spendRepository
-                                .createCategory(spendEntity.getCategory());
-                        spendEntity.setCategory(categoryEntity);
-                    }
-                    return SpendJson.fromEntity(
-                            spendRepository.createSpend(spendEntity)
-                    );
-                }
+        return xaTxTemplate.execute(() -> SpendJson.fromEntity(
+                        spendRepository.createSpend(SpendEntity.fromJson(spend))
+                )
         );
     }
 
     public CategoryJson createCategory(CategoryJson category) {
-        return jdbcTxTemplate.execute(() -> {
-                    CategoryEntity categoryEntity = CategoryEntity.fromJson(category);
-                    return CategoryJson.fromEntity(spendRepository.createCategory(categoryEntity));
-                }
+        return xaTxTemplate.execute(() -> CategoryJson.fromEntity(
+                        spendRepository.createCategory(CategoryEntity.fromJson(category))
+                )
         );
     }
 
-    public void deleteCategory(CategoryJson category) {
-        jdbcTxTemplate.execute(() -> {
-                    CategoryEntity categoryEntity = CategoryEntity.fromJson(category);
-                    spendRepository.deleteCategory(categoryEntity);
+    @Override
+    public SpendJson updateSpend(SpendJson spend) {
+        spendRepository.findSpendById(spend.id()).orElseThrow();
+        return SpendJson.fromEntity(
+                spendRepository.updateSpend(SpendEntity.fromJson(spend))
+        );
+    }
+
+    @Override
+    public void removeCategory(CategoryJson category) {
+        xaTxTemplate.execute(() -> {
+                    spendRepository.findCategoryByID(category.id());
+                    spendRepository.deleteCategory(CategoryEntity.fromJson(category));
                     return null;
                 }
         );
     }
 
-    public void deleteSpend(SpendJson spend) {
-        jdbcTxTemplate.execute(() -> {
-                    SpendEntity spendEntity = SpendEntity.fromJson(spend);
-                    spendRepository.deleteSpend(spendEntity);
+    @Override
+    public void removeSpend(SpendJson spend) {
+        xaTxTemplate.execute(() -> {
+                    spendRepository.findSpendById(spend.id());
+                    spendRepository.deleteSpend(SpendEntity.fromJson(spend));
                     return null;
                 }
         );
     }
 
     public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
-        return jdbcTxTemplate.execute(() -> spendRepository
-                .findCategoryByUsernameAndCategoryName(username, categoryName)
-                .map(CategoryJson::fromEntity)
-        );
+        Optional<CategoryEntity> cat = spendRepository.findCategoryByUsernameAndCategoryName(username, categoryName);
+        return cat.map(CategoryJson::fromEntity);
     }
 
-    public List<CategoryJson> findAllCategoriesByUsername(String username) {
-        return jdbcTxTemplate.execute(() -> spendRepository
-            .findAllCategoriesByUsername(username)
-            .stream()
-            .map(CategoryJson::fromEntity)
-            .collect(Collectors.toList())
-        );
+    public Optional<CategoryJson> findByUsernameAndSpendDescription(String username, String description) {
+        Optional<CategoryEntity> cat = spendRepository.findCategoryByUsernameAndCategoryName(username, description);
+        return cat.map(CategoryJson::fromEntity);
     }
 
-    public List<SpendJson> findSpendsByUsernameAndSpendDescr(String username, String spendDescr) {
-        return jdbcTxTemplate.execute(() -> spendRepository
-            .findSpendsByUsernameAndSpendDescr(username, spendDescr)
-            .stream()
-            .map(SpendJson::fromEntity)
-            .collect(Collectors.toList())
-        );
-    }
+
 }
