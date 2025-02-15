@@ -7,10 +7,12 @@ import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.DataFilterValues;
 import guru.qa.niffler.model.SpendJson;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +30,7 @@ public class GhApiClient {
 
     private final GhApi ghApi = retrofit.create(GhApi.class);
 
-    public String issueState(String issueNumber) {
+    public @Nonnull String issueState(@NotNull String issueNumber) {
         final Response<JsonNode> response;
         try {
             response = ghApi.issue(

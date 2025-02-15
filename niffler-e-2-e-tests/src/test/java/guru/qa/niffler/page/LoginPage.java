@@ -16,6 +16,7 @@ public class LoginPage {
             errorMessage = $(".form__error"),
             header = $(".header");
 
+
     public MainPage doLogin(String username, String password) {
         usernameInput.setValue(username);
         passwordInput.setValue(password);

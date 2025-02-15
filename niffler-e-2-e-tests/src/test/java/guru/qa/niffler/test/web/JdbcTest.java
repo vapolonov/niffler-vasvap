@@ -6,10 +6,12 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
+import java.util.UUID;
 
 
 public class JdbcTest {
@@ -17,7 +19,6 @@ public class JdbcTest {
     @Test
     void txTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
-
         SpendJson spend = spendDbClient.createSpend(
                 new SpendJson(
                         null,
@@ -39,59 +40,56 @@ public class JdbcTest {
     }
 
     @Test
-    void xaTxTest() {
+    void createCategoryTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        CategoryJson category = spendDbClient.createCategory(
+                new CategoryJson(
+                        null,
+                        "test-category-123",
+                        "oliver.leffler",
+                        true
+                )
+        );
+        System.out.println(category);
+    }
+
+    @Test
+    void deleteCategoryTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        spendDbClient.removeCategory(
+                new CategoryJson(
+                        UUID.fromString("d996d488-e64b-11ef-ba8a-0242ac110004"),
+                        "test-category-999",
+                        "jim.zieme",
+                        false
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "valentin-7"
+    })
+    void addFriendshipRequestTest(String username) {
         UsersDbClient usersDbClient = new UsersDbClient();
         UserJson user = usersDbClient.createUser(
-                new UserJson(
-                        null,
-                        "valentin-43",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
+                username,
+                "12345"
         );
+
+        usersDbClient.createIncomeInvitations(user, 1);
         System.out.println(user);
     }
 
     @Test
-    void springJdbcTest() {
+    void addFriendTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
-                new UserJson(
-                        null,
-                        "valentin-19",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
+        UserJson user = usersDbClient.createUser(
+                "valera-2",
+                "12345"
         );
-        System.out.println(user);
-    }
 
-    @Test
-    void chainedTxTest() {
-        UsersDbClient usersDbClient = new UsersDbClient();
-        UserJson user = usersDbClient.createUserTxTemplate(
-                new UserJson(
-                        null,
-                        "valentin-62",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
+        usersDbClient.createFriends(user, 1);
         System.out.println(user);
     }
 }

@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith({
         BrowserExtension.class,
-        UsersQueueExtension.class
 })
 public @interface WebTest {
 }

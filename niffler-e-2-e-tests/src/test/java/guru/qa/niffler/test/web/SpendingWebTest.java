@@ -19,7 +19,7 @@ public class SpendingWebTest {
             username = "vasvap",
             spendings = {@Spending(
                     category = "Courses",
-                    description = "java advanced",
+                    description = "java advanced 2",
                     amount = 50000
             )}
     )

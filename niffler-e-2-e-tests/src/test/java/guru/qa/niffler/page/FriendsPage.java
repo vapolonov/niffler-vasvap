@@ -29,7 +29,6 @@ public class FriendsPage {
     }
 
     public void checkFriendName(String name) {
-//        tableFriendsBody.$("tr").shouldHave(text(name));
         tableFriendsBody.$$("tr").findBy(text(name)).shouldBe(visible);
 
     }
@@ -49,7 +48,6 @@ public class FriendsPage {
     }
 
     public void checkIncomeRequests(String name) {
-//        tableRequestsBody.$$("tr").first().shouldHave(text(name));
         tableRequestsBody.$$("tr").find(text(name)).shouldBe(visible);
     }
 

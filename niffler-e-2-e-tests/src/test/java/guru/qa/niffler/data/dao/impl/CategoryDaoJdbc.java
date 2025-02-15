@@ -44,7 +44,7 @@ public class CategoryDaoJdbc implements CategoryDao {
     }
 
     @Override
-    public void updateCategoryStatus(CategoryEntity category) {
+    public void updateCategory(CategoryEntity category) {
         try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
                 "UPDATE category SET archived = ? WHERE id = ?"
         )) {
@@ -58,7 +58,7 @@ public class CategoryDaoJdbc implements CategoryDao {
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryByID(UUID id) {
+    public Optional<CategoryEntity> findCategoryById(UUID id) {
         try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM category WHERE id = ?"
         )) {

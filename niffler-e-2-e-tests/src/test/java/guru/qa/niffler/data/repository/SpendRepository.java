@@ -8,9 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SpendRepository {
+
     CategoryEntity createCategory(CategoryEntity category);
 
-    void updateCategoryStatus(CategoryEntity category);
+    void updateCategory(CategoryEntity category);
 
     Optional<CategoryEntity> findCategoryByID(UUID id);
 
@@ -24,9 +25,11 @@ public interface SpendRepository {
 
     SpendEntity createSpend(SpendEntity spend);
 
+    SpendEntity updateSpend(SpendEntity spend);
+
     Optional<SpendEntity> findSpendById(UUID id);
 
-    List<SpendEntity> findSpendsByUsernameAndSpendDescr(String username, String spendDescr);
+    Optional<SpendEntity> findSpendsByUsernameAndSpendDescr(String username, String spendDescr);
 
     List<SpendEntity> findAllSpends();
 
