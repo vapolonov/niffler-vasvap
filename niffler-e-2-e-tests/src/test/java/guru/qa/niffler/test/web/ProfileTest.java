@@ -49,7 +49,7 @@ public class ProfileTest {
     void activeCategoryShouldPresentInCategoriesListV2(CategoryJson category) {
         open(CFG.frontUrl(), LoginPage.class)
                 .doLogin("vasvap", "12345")
-                .checkMainPageTitle();
+                .checkThatMainPageHasHistory();
 
         open(CFG.frontUrl() + "profile", ProfilePage.class)
                 .checkCategoryInList(category.name());
