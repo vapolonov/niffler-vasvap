@@ -6,6 +6,7 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.DataFilterValues;
 import guru.qa.niffler.model.SpendJson;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
@@ -13,12 +14,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ParametersAreNonnullByDefault
 public class GhApiClient {
 
     private static final String GH_TOKEN_ENV = "GITHUB_TOKEN";

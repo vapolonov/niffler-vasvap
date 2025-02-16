@@ -4,10 +4,12 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import io.qameta.allure.Step;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +27,8 @@ public class SpendApiClient {
 
     private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
+    @Step("Создать расход через API")
+    @Nonnull
     public SpendJson addSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -33,9 +37,11 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(201, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Редактировать расход через API")
+    @Nonnull
     public SpendJson editSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -44,9 +50,11 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Получить расход по id через API")
+    @Nonnull
     public SpendJson getSpendById(int id) {
         final Response<SpendJson> response;
         try {
@@ -55,9 +63,11 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Получить все расходы через API")
+    @Nonnull
     public SpendJson getSpendsAll(String username, CurrencyValues cur, String from, String to) {
         final Response<SpendJson> response;
         try {
@@ -66,9 +76,10 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Удалить расход через API")
     public void deleteSpends(String username, List<String> ids) {
         final Response<Void> response;
         try {
@@ -79,6 +90,8 @@ public class SpendApiClient {
         assertEquals(200, response.code());
     }
 
+    @Step("Добавить категорию через API")
+    @Nonnull
     public CategoryJson addCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -101,6 +114,8 @@ public class SpendApiClient {
         ) : result;
     }
 
+    @Step("Редактировать категорию через API")
+    @Nonnull
     public CategoryJson updateCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -109,9 +124,11 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Получить все категории через API")
+    @Nonnull
     public List<CategoryJson> allCategories(String username) {
         final Response<List<CategoryJson>> response;
         try {
@@ -120,9 +137,10 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return requireNonNull(response.body());
     }
 
+    @Step("Удалить категорию через API")
     public void removeCategory(CategoryJson category) {
         throw new UnsupportedOperationException("Can`t remove category using API");
     }

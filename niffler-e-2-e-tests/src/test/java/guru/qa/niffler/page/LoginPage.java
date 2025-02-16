@@ -1,11 +1,16 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
+@ParametersAreNonnullByDefault
 public class LoginPage {
 
     private final SelenideElement
@@ -17,6 +22,8 @@ public class LoginPage {
             header = $(".header");
 
 
+    @Step("Авторизация пользователя {0}, {1}")
+    @Nonnull
     public MainPage doLogin(String username, String password) {
         usernameInput.setValue(username);
         passwordInput.setValue(password);
@@ -24,6 +31,8 @@ public class LoginPage {
         return new MainPage();
     }
 
+    @Step("Авторизация пользователя c некорректными данными")
+    @Nonnull
     public LoginPage doLoginWithBadCredentials(String username, String password) {
         usernameInput.setValue(username);
         passwordInput.setValue(password);
@@ -31,16 +40,21 @@ public class LoginPage {
         return this;
     }
 
+    @Step("Создать новый аккаунт")
+    @Nonnull
     public RegisterPage createAccount() {
         createAccountButton.click();
         return new RegisterPage();
     }
 
+    @Step("Проверить ошибку при неверном вводе данных")
+    @Nonnull
     public LoginPage checkBadCredentialsErrorMsg() {
         errorMessage.shouldBe(visible).shouldHave(text("Неверные учетные данные пользователя"));
         return this;
     }
 
+    @Step("Проверить заголовок страницы логина")
     public void checkLoginPageTitle() {
         header.shouldBe(visible).shouldHave(text("Log in"));
     }
