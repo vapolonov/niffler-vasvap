@@ -1,14 +1,20 @@
-package guru.qa.niffler.model;
+package guru.qa.niffler.model.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Date;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public record SpendJson(
         @JsonProperty("id")
+        @Nullable
         UUID id,
         @JsonProperty("spendDate")
         Date spendDate,
@@ -23,7 +29,7 @@ public record SpendJson(
         @JsonProperty("username")
         String username) {
 
-    public static SpendJson fromEntity(SpendEntity entity) {
+    public static @Nonnull SpendJson fromEntity(SpendEntity entity) {
         final CategoryEntity category = entity.getCategory();
         final String username = entity.getUsername();
 

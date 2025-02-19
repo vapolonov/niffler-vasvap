@@ -2,36 +2,53 @@ package guru.qa.niffler.data.repository;
 
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryHibernate;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.SpendRepositorySpringJdbc;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface SpendRepository {
 
+    @Nonnull
+    static SpendRepository getInstance() {
+        return switch (System.getProperty("repository.impl", "jpa")) {
+            case "jpa" -> new SpendRepositoryHibernate();
+            case "jdbc" -> new SpendRepositoryJdbc();
+            case "sjdbc" -> new SpendRepositorySpringJdbc();
+            default -> throw new IllegalStateException("Unexpected value: " + System.getProperty("repository.impl"));
+        };
+    }
+
+    @Nonnull
+    SpendEntity create(SpendEntity spend);
+
+    @Nonnull
+    SpendEntity update(SpendEntity spend);
+
+    @Nonnull
     CategoryEntity createCategory(CategoryEntity category);
 
-    void updateCategory(CategoryEntity category);
+    @NotNull CategoryEntity updateCategory(CategoryEntity category);
 
-    Optional<CategoryEntity> findCategoryByID(UUID id);
+    @Nonnull
+    Optional<CategoryEntity> findCategoryById(UUID id);
 
-    Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName);
+    @Nonnull
+    Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name);
 
-    List<CategoryEntity> findAllCategoriesByUsername(String username);
+    @Nonnull
+    Optional<SpendEntity> findById(UUID id);
 
-    List<CategoryEntity> findAllCategories();
+    @Nonnull
+    Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description);
 
-    void deleteCategory(CategoryEntity category);
+    void remove(SpendEntity spend);
 
-    SpendEntity createSpend(SpendEntity spend);
-
-    SpendEntity updateSpend(SpendEntity spend);
-
-    Optional<SpendEntity> findSpendById(UUID id);
-
-    Optional<SpendEntity> findSpendsByUsernameAndSpendDescr(String username, String spendDescr);
-
-    List<SpendEntity> findAllSpends();
-
-    void deleteSpend(SpendEntity spend);
+    void removeCategory(CategoryEntity category);
 }

@@ -5,8 +5,11 @@ import guru.qa.niffler.data.dao.UserdataDao;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.user.FriendshipEntity;
 import guru.qa.niffler.data.entity.user.UserEntity;
+import guru.qa.niffler.data.mapper.UserdataEntityRowMapper;
 import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,168 +18,156 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.tpl.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class UserdataDaoJdbc implements UserdataDao {
 
     private static final Config CFG = Config.getInstance();
+    private final String url = CFG.userdataJdbcUrl();
 
+    @SuppressWarnings("resource")
+    @Nonnull
     @Override
-    public UserEntity createUser(UserEntity user) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "INSERT INTO \"user\" (username, currency) VALUES (?, ?)",
-                Statement.RETURN_GENERATED_KEYS
-        )) {
+    public UserEntity create(UserEntity user) {
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
+                """
+                           INSERT INTO "user" (username, currency) VALUES (?, ?)
+                        """,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getCurrency().name());
-
             ps.executeUpdate();
-
-            final UUID generatedKey;
+            final UUID generatedUserId;
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    generatedKey = rs.getObject("id", UUID.class);
+                    generatedUserId = rs.getObject("id", UUID.class);
                 } else {
-                    throw new SQLException("Can't find id in ResultSet");
+                    throw new IllegalStateException("Can`t find id in ResultSet");
                 }
             }
-            user.setId(generatedKey);
+            user.setId(generatedUserId);
             return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("resource")
+    @Nonnull
     @Override
     public UserEntity update(UserEntity user) {
-        try (PreparedStatement usersPs = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "UPDATE \"user\" SET username = ?, currency = ?, firstname = ?, surname = ?, " +
-                        "photo = ?, photo_small = ?, full_name = ? WHERE id = ?");
-             PreparedStatement friendsPs = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                     "INSERT INTO friendship (requester_id, addressee_id, status) " +
-                             "VALUES (?, ?, ?) ON CONFLICT (requester_id, addressee_id) " +
-                             "DO UPDATE SET status = ?"
-        )) {
-            usersPs.setString(1, user.getUsername());
-            usersPs.setString(2, user.getCurrency().name());
-            usersPs.setString(3, user.getFirstname());
-            usersPs.setString(4, user.getSurname());
-            usersPs.setBytes(5, user.getPhoto());
-            usersPs.setBytes(6, user.getPhotoSmall());
-            usersPs.setString(7, user.getFullname());
-            usersPs.setObject(8, user.getId());
+        try (PreparedStatement usersPs = holder(url).connection().prepareStatement(
+                """
+                          UPDATE "user"
+                            SET currency    = ?,
+                                firstname   = ?,
+                                surname     = ?,
+                                photo       = ?,
+                                photo_small = ?
+                            WHERE id = ?
+                        """);
 
-            for (FriendshipEntity f: user.getFriendshipRequests()) {
-                friendsPs.setObject(1, f.getRequester().getId());
-                friendsPs.setObject(2, f.getAddressee().getId());
-                friendsPs.setObject(3, f.getStatus().name());
-                friendsPs.setObject(4, f.getStatus().name());
+             PreparedStatement friendsPs = holder(url).connection().prepareStatement(
+                     """
+                             INSERT INTO friendship (requester_id, addressee_id, status)
+                             VALUES (?, ?, ?)
+                             ON CONFLICT (requester_id, addressee_id)
+                                 DO UPDATE SET status = ?
+                             """)
+        ) {
+            usersPs.setString(1, user.getCurrency().name());
+            usersPs.setString(2, user.getFirstname());
+            usersPs.setString(3, user.getSurname());
+            usersPs.setBytes(4, user.getPhoto());
+            usersPs.setBytes(5, user.getPhotoSmall());
+            usersPs.setObject(6, user.getId());
+            usersPs.executeUpdate();
+
+            for (FriendshipEntity fe : user.getFriendshipRequests()) {
+                friendsPs.setObject(1, user.getId());
+                friendsPs.setObject(2, fe.getAddressee().getId());
+                friendsPs.setString(3, fe.getStatus().name());
+                friendsPs.setString(4, fe.getStatus().name());
                 friendsPs.addBatch();
                 friendsPs.clearParameters();
             }
             friendsPs.executeBatch();
-            return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return user;
     }
 
+    @SuppressWarnings("resource")
+    @Nonnull
     @Override
     public Optional<UserEntity> findById(UUID id) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "SELECT * FROM \"user\" WHERE id = ?"
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
+                """
+                            SELECT * FROM "user" WHERE id = ?
+                        """
         )) {
             ps.setObject(1, id);
 
             ps.execute();
+            ResultSet rs = ps.getResultSet();
 
-            try (ResultSet rs = ps.getResultSet()) {
-                if (rs.next()) {
-                    UserEntity ue = new UserEntity();
-                    ue.setId(id);
-                    ue.setUsername(rs.getString("username"));
-                    ue.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
-                    ue.setFirstname(rs.getString("firstname"));
-                    ue.setSurname(rs.getString("surname"));
-                    ue.setPhoto(rs.getBytes("photo"));
-                    ue.setPhotoSmall(rs.getBytes("photo_small"));
-                    ue.setFullname(rs.getString("full_name"));
-                    return Optional.of(ue);
-                } else {
-                    return Optional.empty();
-                }
+            if (rs.next()) {
+                return Optional.ofNullable(
+                        UserdataEntityRowMapper.instance.mapRow(rs, rs.getRow())
+                );
+            } else {
+                return Optional.empty();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("resource")
+    @Nonnull
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "SELECT * FROM \"user\" WHERE username = ?"
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
+                """
+                            SELECT * FROM "user" WHERE username = ?
+                        """
         )) {
-            ps.setObject(1, username);
+            ps.setString(1, username);
 
             ps.execute();
+            ResultSet rs = ps.getResultSet();
 
-            try (ResultSet rs = ps.getResultSet()) {
-                if (rs.next()) {
-                    UserEntity ue = new UserEntity();
-                    ue.setId(rs.getObject("id", UUID.class));
-                    ue.setUsername(rs.getString("username"));
-                    ue.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
-                    ue.setFirstname(rs.getString("firstname"));
-                    ue.setSurname(rs.getString("surname"));
-                    ue.setPhoto(rs.getBytes("photo"));
-                    ue.setPhotoSmall(rs.getBytes("photo_small"));
-                    ue.setFullname(rs.getString("full_name"));
-                    return Optional.of(ue);
-                } else {
-                    return Optional.empty();
-                }
+            if (rs.next()) {
+                return Optional.ofNullable(
+                        UserdataEntityRowMapper.instance.mapRow(rs, rs.getRow())
+                );
+            } else {
+                return Optional.empty();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("resource")
+    @Nonnull
     @Override
     public List<UserEntity> findAll() {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "SELECT * FROM \"user\"")) {
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
+                "SELECT * FROM spend"
+        )) {
             ps.execute();
-
             List<UserEntity> result = new ArrayList<>();
-
             try (ResultSet rs = ps.getResultSet()) {
                 while (rs.next()) {
-                    UserEntity ue = new UserEntity();
-                    ue.setId(rs.getObject("id", UUID.class));
-                    ue.setUsername(rs.getString("username"));
-                    ue.setCurrency(CurrencyValues.valueOf("currency"));
-                    ue.setFirstname(rs.getString("firstname"));
-                    ue.setSurname(rs.getString("surname"));
-                    ue.setPhoto(rs.getBytes("photo"));
-                    ue.setPhotoSmall(rs.getBytes("photo_small"));
-                    ue.setFullname(rs.getString("full_name"));
-                    result.add(ue);
+                    result.add(
+                            UserdataEntityRowMapper.instance.mapRow(rs, rs.getRow())
+                    );
                 }
             }
             return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void delete(UserEntity user) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "DELETE FROM \"user\" WHERE id = ?"
-        )) {
-            ps.setObject(1, user.getId());
-            ps.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 }

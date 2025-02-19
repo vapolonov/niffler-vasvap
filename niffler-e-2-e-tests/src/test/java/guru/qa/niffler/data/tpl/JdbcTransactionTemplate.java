@@ -1,5 +1,6 @@
 package guru.qa.niffler.data.tpl;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
@@ -8,6 +9,7 @@ import java.util.function.Supplier;
 
 import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
+@ParametersAreNonnullByDefault
 public class JdbcTransactionTemplate {
 
     private final JdbcConnectionHolder holder;

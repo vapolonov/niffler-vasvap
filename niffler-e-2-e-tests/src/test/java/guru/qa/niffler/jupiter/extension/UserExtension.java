@@ -1,9 +1,9 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
-import guru.qa.niffler.service.UsersDbClient;
+import guru.qa.niffler.service.impl.UsersDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -24,9 +24,9 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                     if ("".equals(userAnno.username())) {
                         final String username = randomUsername();
                         UserJson user = usersClient.createUser(username, defaultPassword);
-                        usersClient.createIncomeInvitations(user, userAnno.incomeInvitations());
-                        usersClient.createOutcomeInvitations(user, userAnno.outcomeInvitations());
-                        usersClient.createFriends(user, userAnno.friends());
+                        usersClient.createIncomeInvitation(user, userAnno.incomeInvitations());
+                        usersClient.createOutcomeInvitation(user, userAnno.outcomeInvitations());
+                        usersClient.addFriend(user, userAnno.friends());
 
                         context.getStore(NAMESPACE).put(
                                 context.getUniqueId(),

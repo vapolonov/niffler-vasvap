@@ -10,24 +10,31 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class SpendDaoSpringJdbc implements SpendDao {
 
     private static final Config CFG = Config.getInstance();
+    private final String url = CFG.spendJdbcUrl();
 
+    @Nonnull
     @Override
-    public SpendEntity createSpend(SpendEntity spend) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+    public SpendEntity create(SpendEntity spend) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(url));
         KeyHolder kh = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO spend (username, spend_date, currency, amount, description, category_id) " +
-                            "VALUES (?, ?, ?, ?, ?, ?)",
+                    """
+                                INSERT INTO spend (username, spend_date, currency, amount, description, category_id) 
+                                VALUES ( ?, ?, ?, ?, ?, ?)
+                            """,
                     Statement.RETURN_GENERATED_KEYS
             );
             ps.setString(1, spend.getUsername());
@@ -38,32 +45,16 @@ public class SpendDaoSpringJdbc implements SpendDao {
             ps.setObject(6, spend.getCategory().getId());
             return ps;
         }, kh);
+
         final UUID generatedKey = (UUID) kh.getKeys().get("id");
         spend.setId(generatedKey);
         return spend;
     }
 
+    @Nonnull
     @Override
-    public SpendEntity update(SpendEntity spend) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE spend SET username = ?, spend_date = ?, currency = ?, amount = ?, " +
-                            "description = ?, category_id = ?");
-            ps.setString(1, spend.getUsername());
-            ps.setDate(2, new java.sql.Date(spend.getSpendDate().getTime()));
-            ps.setString(3, spend.getCurrency().name());
-            ps.setDouble(4, spend.getAmount());
-            ps.setString(5, spend.getDescription());
-            ps.setObject(6, spend.getCategory().getId());
-            return ps;
-        });
-        return spend;
-    }
-
-    @Override
-    public Optional<SpendEntity> findSpendById(UUID id) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+    public Optional<SpendEntity> findById(UUID id) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(url));
         try {
             return Optional.ofNullable(
                     jdbcTemplate.queryForObject(
@@ -77,44 +68,36 @@ public class SpendDaoSpringJdbc implements SpendDao {
         }
     }
 
+    @Nonnull
     @Override
-    public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        return Optional.ofNullable(
-                jdbcTemplate.queryForObject(
-                        "SELECT * FROM spend WHERE username = ? AND description = ?",
-                        SpendEntityRowMapper.instance,
-                        username,
-                        description
-                )
-        );
-    }
-
-    @Override
-    public List<SpendEntity> findAllSpendsByUsername(String username) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+    public List<SpendEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(url));
         return jdbcTemplate.query(
-                "SELECT * FROM spend WHERE username = ?",
-                SpendEntityRowMapper.instance,
-                username
-        );
-    }
-
-    @Override
-    public List<SpendEntity> findAllSpends() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        return jdbcTemplate.query(
-                "SELECT * FROM spend",
+                """
+                           SELECT * FROM "spend"
+                        """,
                 SpendEntityRowMapper.instance
         );
     }
 
+    @Nonnull
     @Override
-    public void deleteSpend(SpendEntity spend) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        jdbcTemplate.update(
-                "DELETE FROM spend WHERE id = ?",
+    public SpendEntity update(SpendEntity spend) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(url));
+        jdbcTemplate.update("""
+                          UPDATE "spend"
+                            SET spend_date  = ?,
+                                currency    = ?,
+                                amount      = ?,
+                                description = ?
+                            WHERE id = ?
+                        """,
+                new java.sql.Date(spend.getSpendDate().getTime()),
+                spend.getCurrency().name(),
+                spend.getAmount(),
+                spend.getDescription(),
                 spend.getId()
         );
+        return spend;
     }
 }

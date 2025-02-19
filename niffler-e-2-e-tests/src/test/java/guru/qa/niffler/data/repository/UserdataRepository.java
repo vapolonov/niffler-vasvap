@@ -1,22 +1,41 @@
 package guru.qa.niffler.data.repository;
 
 import guru.qa.niffler.data.entity.user.UserEntity;
+import guru.qa.niffler.data.repository.impl.UserdataRepositoryHibernate;
+import guru.qa.niffler.data.repository.impl.UserdataRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.UserdataRepositorySpringJdbc;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface UserdataRepository {
-    UserEntity createUser(UserEntity user);
 
-    UserEntity update(UserEntity user);
+  @Nonnull
+  static UserdataRepository getInstance() {
+    return switch (System.getProperty("repository.impl", "jpa")) {
+      case "jpa" -> new UserdataRepositoryHibernate();
+      case "jdbc" -> new UserdataRepositoryJdbc();
+      case "sjdbc" -> new UserdataRepositorySpringJdbc();
+      default -> throw new IllegalStateException("Unexpected value: " + System.getProperty("repository.impl"));
+    };
+  }
 
-    Optional<UserEntity> findById(UUID id);
+  @Nonnull
+  UserEntity create(UserEntity user);
 
-    Optional<UserEntity> findByUsername(String username);
+  @Nonnull
+  UserEntity update(UserEntity user);
 
-    void delete(UserEntity user);
+  @Nonnull
+  Optional<UserEntity> findById(UUID id);
 
-    void sendInvitation(UserEntity requester, UserEntity addressee);
+  @Nonnull
+  Optional<UserEntity> findByUsername(String username);
 
-    void addFriend(UserEntity requester, UserEntity addressee);
+  void addFriendshipRequest(UserEntity requester, UserEntity addressee);
+
+  void addFriend(UserEntity requester, UserEntity addressee);
 }
