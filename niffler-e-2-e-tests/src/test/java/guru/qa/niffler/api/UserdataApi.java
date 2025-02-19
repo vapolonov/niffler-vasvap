@@ -1,12 +1,13 @@
 package guru.qa.niffler.api;
 
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 import retrofit2.Call;
 import retrofit2.http.*;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public interface UsersApi {
+public interface UserdataApi {
 
     @GET("internal/users/current")
     Call<UserJson> currentUser(@Query("username") String username);
@@ -15,14 +16,24 @@ public interface UsersApi {
     Call<UserJson> updateUserInfo(@Body UserJson user);
 
     @GET("internal/users/all")
-    Call<List<UserJson>> allUsers(@Query("sort") String username);
+    Call<List<UserJson>> allUsers(@Query("username") String username,
+                                  @Query("searchQuery") @Nullable String searchQuery);
 
     @GET("internal/friends/all")
-    Call<List<UserJson>> allFriends(@Query("sort") String username);
+    Call<List<UserJson>> friends(@Query("username") String username,
+                                 @Query("searchQuery") @Nullable String searchQuery);
 
     @DELETE("internal/friends/remove")
     Call<Void> removeFriend(@Query("username") String username,
                             @Query("targetUsername") String targetUsername);
+
+    @GET("internal/invitations/income")
+    Call<List<UserJson>> incomeInvitations(@Query("username") String username,
+                                           @Query("searchQuery") @Nullable String searchQuery);
+
+    @GET("internal/invitations/outcome")
+    Call<List<UserJson>> outcomeInvitations(@Query("username") String username,
+                                            @Query("searchQuery") @Nullable String searchQuery);
 
     @POST("internal/invitations/accept")
     Call<UserJson> acceptInvitation(@Query("username") String username,
