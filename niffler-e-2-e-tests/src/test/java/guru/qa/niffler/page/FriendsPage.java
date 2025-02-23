@@ -2,21 +2,21 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
-import org.checkerframework.checker.units.qual.N;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static com.codeborne.selenide.ClickOptions.usingJavaScript;
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.CollectionCondition.textsInAnyOrder;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 @ParametersAreNonnullByDefault
-public class FriendsPage {
+public class FriendsPage extends BasePage<FriendsPage> {
 
     private final String
             NO_USERS_FOUND = "There are no users yet",
@@ -27,8 +27,16 @@ public class FriendsPage {
             tableRequestsBody = $("#requests"),
             friendsTab = $$("[role='tablist'] h2").first(),
             allPeopleTab = $$("[role='tablist'] h2").get(1),
-            noUsersText = $("[role='tabpanel'] p");
-    ;
+            noUsersText = $("[role='tabpanel'] p"),
+            popup = $("div[role='dialog']");
+
+    @Override
+    @Nonnull
+    public FriendsPage checkThatPageLoaded() {
+        friendsTab.shouldBe(visible);
+        allPeopleTab.shouldBe(visible);
+        return this;
+    }
 
     @Step("проверить, что страница открыта")
     @Nonnull
@@ -88,4 +96,36 @@ public class FriendsPage {
         return new AllPeoplePage();
     }
 
+    @Step("Удалить пользователя из друзей: {username}")
+    @Nonnull
+    public FriendsPage removeFriend(String username) {
+        SelenideElement friendRow = tableFriendsBody.$$("tr").find(text(username));
+        friendRow.$("button[type='button']").click();
+        popup.$(byText("Delete")).click(usingJavaScript());
+        return this;
+    }
+
+    @Step("Проверить, что количество приглашений равно {expectedCount}")
+    @Nonnull
+    public FriendsPage checkExistingInvitationsCount(int expectedCount) {
+        tableRequestsBody.$$("tr").shouldHave(size(expectedCount));
+        return this;
+    }
+
+    @Step("Accept invitation from user: {username}")
+    @Nonnull
+    public FriendsPage acceptFriendInvitationFromUser(String username) {
+        SelenideElement friendRow = tableRequestsBody.$$("tr").find(text(username));
+        friendRow.$(byText("Accept")).click();
+        return this;
+    }
+
+    @Step("Decline invitation from user: {username}")
+    @Nonnull
+    public FriendsPage declineFriendInvitationFromUser(String username) {
+        SelenideElement friendRow = tableRequestsBody.$$("tr").find(text(username));
+        friendRow.$(byText("Decline")).click();
+        popup.$(byText("Decline")).click(usingJavaScript());
+        return this;
+    }
 }

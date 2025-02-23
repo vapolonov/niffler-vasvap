@@ -11,17 +11,20 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class Header {
+public class Header extends BaseComponent<Header> {
+
+    public Header() {
+        super($("#root header"));
+    }
 
     private final SelenideElement
-            self = $("header"),
             title = self.$("h1"),
             mainPageLink = self.$("a[href='/main']"),
             newSpendingBtn = self.$("a[href='/spending']"),
-            profileBtn = self.$("a[href='/profile']"),
-            friendsBtn = self.$("a[href='/people/friends']"),
-            allPeopleBtn = self.$("a[href='/people/all']"),
-            signOutBtn = self.$("a[href='/?']"),
+            profileBtn = $("a[href='/profile']"),
+            friendsBtn = $("a[href='/people/friends']"),
+            allPeopleBtn = $("a[href='/people/all']"),
+            signOutBtn = $("a[href='/?']"),
             mainMenuBtn = self.$("button[aria-label='Menu']");
 
 

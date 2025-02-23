@@ -17,17 +17,19 @@ import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class SpendingTable {
+public class SpendingTable extends BaseComponent<SpendingTable> {
+
+    public SpendingTable() {
+        super($("#spendings"));
+    }
 
     SearchField searchField = new SearchField();
 
     private final SelenideElement
-            self = $("#period"),
             dropdownList = $("[role='listbox']"),
             selectPeriod = $("[name='period']"),
             deleteBtn = $("#delete"),
             popup = $("div[role='dialog']");
-    ;
 
     private final ElementsCollection tableRows = self.$("tbody").$$("tr");
 

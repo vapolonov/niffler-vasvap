@@ -11,7 +11,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class LoginPage {
+public class LoginPage extends BasePage<LoginPage> {
 
     private final SelenideElement
             usernameInput = $("input[name='username']"),
@@ -21,6 +21,14 @@ public class LoginPage {
             errorMessage = $(".form__error"),
             header = $(".header");
 
+    @Override
+    @Step("Проверить, что страница загружена")
+    @Nonnull
+    public LoginPage checkThatPageLoaded() {
+        usernameInput.should(visible);
+        passwordInput.should(visible);
+        return this;
+    }
 
     @Step("Авторизация пользователя {0}, {1}")
     @Nonnull

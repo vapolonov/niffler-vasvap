@@ -7,10 +7,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class RegisterPage {
+public class RegisterPage extends BasePage<RegisterPage> {
 
     private final SelenideElement
             usernameInput = $("#username"),
@@ -21,6 +22,15 @@ public class RegisterPage {
             signinButton = $(".form_sign-in"),
             errorMessage = $(".form__error");
 
+    @Step("Проверить, что страница загружена")
+    @Override
+    @Nonnull
+    public RegisterPage checkThatPageLoaded() {
+        usernameInput.should(visible);
+        passwordInput.should(visible);
+        passwordSubmitInput.should(visible);
+        return this;
+    }
 
     @Step("Ввести имя пользователя")
     @Nonnull
@@ -28,7 +38,6 @@ public class RegisterPage {
         usernameInput.setValue(username);
         return this;
     }
-
 
     @Step("Ввести пароль пользователя")
     @Nonnull

@@ -11,11 +11,19 @@ import static com.codeborne.selenide.Condition.not;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class SearchField {
+public class SearchField extends BaseComponent<SearchField> {
+
+    protected SearchField(SelenideElement self) {
+        super(self);
+    }
+
+    public SearchField() {
+        super($("input[aria-label='search']"));
+    }
 
     private final SelenideElement
-            self = $("input[aria-label='search']"),
             clearSearchBtn = $("#input-clear");
+
 
     @Nonnull
     @Step("Поиск записи в таблице по запросу '{0}'")
