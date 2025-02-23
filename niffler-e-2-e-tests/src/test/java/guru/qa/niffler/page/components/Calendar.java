@@ -14,7 +14,15 @@ import static com.codeborne.selenide.Selenide.$;
 import static java.util.Calendar.*;
 
 @ParametersAreNonnullByDefault
-public class Calendar {
+public class Calendar extends BaseComponent<Calendar> {
+
+    public Calendar(SelenideElement self) {
+        super(self);
+    }
+
+    public Calendar() {
+    super($(".MuiPickersLayout-root"));
+  }
 
     private final SelenideElement
             self = $(".MuiPickersLayout-root"),
@@ -25,6 +33,8 @@ public class Calendar {
             currentMonthAndYear = self.$(".MuiPickersCalendarHeader-label");
 
     private final ElementsCollection dateRows = self.$$(".MuiDayCalendar-weekContainer");
+
+
 
     @Step("Ввести дату в календаре {0}")
     public Calendar typeDateInCalendar(String date) {

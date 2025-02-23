@@ -23,7 +23,7 @@ public class AllPeoplePage {
 
     private final SearchField searchInput = new SearchField();
 
-    @Step("Check that the page is loaded")
+    @Step("Проверить, что страница загрузилась")
     @Nonnull
     public AllPeoplePage checkThatPageLoaded() {
         peopleTab.shouldBe(Condition.visible);
